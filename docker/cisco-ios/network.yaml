@@ -1,0 +1,17 @@
+- hosts: localhost
+  gather_facts: False
+  vars:
+      container_image: gdpak/cisco-ios
+      container_ssh_password: redhat1234
+  tasks:
+      - debug: var=total_nodes
+      - name: run the containers
+        docker_container:
+            name: "{{ item }}"
+            image: "{{ container_image }}"
+            state: started
+            privileged: True
+            volumes:
+                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        with_sequence: start=0 end={{ total_nodes|default('100') }} format=switch_%02x
+        become: yes
